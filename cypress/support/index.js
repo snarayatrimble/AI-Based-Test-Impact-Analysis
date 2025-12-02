@@ -40,8 +40,8 @@ if (!('structuredClone' in window)) {
   });
   
   
-  import addContext from "mochawesome/addContext";
-  require('cypress-xpath')
+  require('cypress-xpath');
+  const mochawesome = require('mochawesome/addContext');
   //import '@cypress/code-coverage/support'
   
    const path = require( 'path' ),
