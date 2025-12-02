@@ -1,5 +1,4 @@
-/// <reference types="Cypress" />
-/// <reference types="cypress-xpath" />
+
 import landingpage from '../pageobjects/landingpage.js';
 import 'cypress-wait-until';
 
