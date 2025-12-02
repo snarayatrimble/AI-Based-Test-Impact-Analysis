@@ -4,12 +4,11 @@ module.exports = {
       return require('./cypress/plugins/index.js')(on, config);
     },
   "chromeWebSecurity": false,
-  "reporter": "cypress-multi-reporters",
   "CYPRESS_DISABLE_ATOM_CACHE": true,
   "screenshotOnRunFailure":true,
   "pageLoadTimeout":60000,
   "env": {
-    "landingpageurl":"https://fleetcockpitplus.stg.trimbletl.com/",
+    "applicationurl":"https://fleetcockpitplus.stg.trimbletl.com/",
     "Device": "pc-testvehicle03",
     "Customer":"Autotest04",
     "CustomerDevice":"Test Unit",
