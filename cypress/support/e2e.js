@@ -13,19 +13,30 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+
+if (!('structuredClone' in window)) {
+  window.structuredClone = (data) => {
+      return Cypress._.cloneDeep(data);
+  };
+}
+
 // Import commands.js using ES2015 syntax:
-import addContext from 'mochawesome/addContext';
-require("cypress-xpath");
+
+
+import addContext from "mochawesome/addContext";
+require('cypress-xpath')
 //import '@cypress/code-coverage/support'
 
  const path = require( 'path' ),
-	logPath = process.env.LOG_DIR || path.join( __dirname, '..', 'log' );
+    logPath = process.env.LOG_DIR || path.join( __dirname, '..', 'log' );
 
 module.exports = ( on, config ) => {
 
-	config.screenshotsFolder = path.join( logPath, 'screenshots' );
-	return config;
+    config.screenshotsFolder = path.join( logPath, 'screenshots' );
+    return config;
 };
+
+
 
 Cypress.on('test:after:run', (test, runnable) => {
 
