@@ -1,0 +1,18 @@
+[
+    {
+      "modified_files": ["file1.js"],
+      "test_names": ["test1.spec.js"],
+      "outcome": 1
+    },
+    {
+      "modified_files": ["file2.js"],
+      "test_names": ["test2.spec.js"],
+      "outcome": 0
+    },
+    {
+      "modified_files": ["file1.js", "file3.js"],
+      "test_names": ["test1.spec.js", "test3.spec.js"],
+      "outcome": 1
+    }
+  ]
+  
