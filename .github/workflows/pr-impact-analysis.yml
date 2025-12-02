@@ -1,66 +1,48 @@
-name: Impacted Tests Based on Changes
+name: CI Pipeline for AI-based Test Impact Analysis
 
 on:
-  pull_request:
-    branches:
-      - main
-      - master 
-      - test # Include master as well if you have both branches
   push:
     branches:
-      - test  # Replace with your feature branch name
+      - main 
+      - master
+      - test  # Trigger on push to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger on PRs targeting the main branch
 
 jobs:
-  impact-analysis:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code
-      - name: Checkout code
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          fetch-depth: 0  # Fetch full history for proper comparison
+          node-version: '18'  # Specify the Node.js version you want to use
 
-      # Step 2: Fetch the default branch dynamically
-      - name: Get default branch name
-        id: get_default_branch
+      # Step 3: Install dependencies
+      - name: Install Dependencies
         run: |
-          # Use GitHub API to fetch the default branch
-          DEFAULT_BRANCH=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}" \
-            | jq -r '.default_branch')
-          echo "DEFAULT_BRANCH=$DEFAULT_BRANCH" >> $GITHUB_ENV
+          npm install
 
-      # Step 3: Fetch the latest commits from the default branch
-      - name: Fetch latest commits from the default branch
+      # Step 4: Train TensorFlow.js Model (run model.js)
+      - name: Train AI Model
         run: |
-          git fetch origin ${{ env.DEFAULT_BRANCH }}  # Dynamically fetch default branch
+          node model/model.js
 
-      # Step 4: Get modified files using git diff
-      - name: Get modified files
-        id: get_changed_files
+      # Step 5: Run Cypress Tests
+      - name: Run Cypress Tests
         run: |
-          # Use git diff to get the list of files modified between the default branch and HEAD
-          PR_DIFF=$(git diff --name-only origin/${{ env.DEFAULT_BRANCH }}...HEAD)
-          echo "Changed files: $PR_DIFF"
+          npx cypress run --reporter mochawesome --reporter-options reportDir=cypress/reports,overwrite=true,html=false,json=true
 
-          # Save changed files to environment variable
-          echo "PR_DIFF<<EOF" >> $GITHUB_ENV
-          echo "$PR_DIFF" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      # Step 5: Run impacted tests based on changed files
-      - name: Run impacted tests
-        run: |
-          if [[ "$PR_DIFF" == *"src/login.js"* ]]; then
-            echo "Running login tests..."
-            # Run the Cypress tests impacted by the login.js file
-          npx cypress run --spec cypress/e2e/integration/login.cy.js  # Correct glob pattern
-          fi
-
-          if [[ "$PR_DIFF" == *"src/navbar.js"* ]]; then
-            echo "Running navbar tests..."
-            # Run impacted tests for navbar
-            npx cypress run --spec 'cypress/e2e/integration/navbar.cy.js'
-          fi
+      # Step 6: Upload Mochawesome Report as an Artifact (Optional)
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: mochawesome-report
+          path: cypress/reports/*.json
