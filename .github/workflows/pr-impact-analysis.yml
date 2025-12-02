@@ -1,39 +1,52 @@
-name: Impact Analysis and Cypress Tests
+name: PR Impact Analysis
 
 on:
   push:
     branches:
-      - master        # This will trigger on commits to the main branch
-jobs:
-  impact-analysis:
-    runs-on: ubuntu-latest
+      - main
+      - feature/*  # Include feature branches as needed
+  pull_request:
+    branches:
+      - main
 
+jobs:
+  test-impact:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
-      - name: Install dependencies
+      # Fetch the latest changes from the origin/main branch
+      - name: Fetch origin/main
         run: |
-          npm install
+          git fetch origin main
 
-      - name: Get commit diff (for push or PR)
+      - name: Get diff for PR or commit
         id: get_diff
         run: |
-          # Get diff for commits or PR
+          # If the event is a pull request, we calculate the diff from the main branch to the PR branch
           if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-            git fetch origin main
             PR_DIFF=$(git diff origin/main...HEAD)
           else
+            # If it's a regular commit, calculate the diff from HEAD~1
+            git fetch --unshallow  # Ensure full history is fetched
             PR_DIFF=$(git diff HEAD~1)
           fi
+
+          # If the diff is empty (e.g., first commit), set it to "None"
+          if [ -z "$PR_DIFF" ]; then
+            echo "No changes detected in this commit."
+            PR_DIFF="None"
+          fi
+
+          # Save the diff into an environment variable for further use
           echo "PR_DIFF<<EOF" >> $GITHUB_ENV
           echo "$PR_DIFF" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+
+      # Add additional steps for running the impacted tests based on PR_DIFF
+
+
 
       - name: Run impact analysis
         id: run_analysis
