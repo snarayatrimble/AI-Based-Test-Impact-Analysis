@@ -1,39 +1,71 @@
-name: Impact Analysis and Cypress Tests
+name: Impacted Tests
 
 on:
   push:
     branches:
-      - master        # This will trigger on commits to the main branch
+      - test      # or any feature branch
+  pull_request:
+    branches:
+      - main
+
 jobs:
   impact-analysis:
     runs-on: ubuntu-latest
-
     steps:
+      # Step 1: Checkout the code
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/checkout@v3
         with:
-          node-version: '16'
+          fetch-depth: 0  # Fetch full history, not just the latest commit
 
-      - name: Install dependencies
+      # Step 2: Fetch all remote branches
+      - name: Fetch origin/main branch
         run: |
-          npm install
+          git fetch origin main  # Explicitly fetch the remote 'main' branch
 
-      - name: Get commit diff (for push or PR)
+      # Step 3: Get the diff between the current branch and origin/main
+      - name: Get PR diff
         id: get_diff
         run: |
-          # Get diff for commits or PR
+          # If the event is a pull request, compare the PR branch with origin/main
           if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-            git fetch origin main
-            PR_DIFF=$(git diff origin/main...HEAD)
+            PR_DIFF=$(git diff origin/main...HEAD)  # Compare PR branch (HEAD) with origin/main
           else
-            PR_DIFF=$(git diff HEAD~1)
+            # If it's a push event, calculate the diff between the current commit (HEAD) and previous commit (HEAD~1)
+            PR_DIFF=$(git diff HEAD~1)  # Compare the current commit to the previous commit
           fi
+
+          # If there are no changes (empty diff), set PR_DIFF to "None"
+          if [ -z "$PR_DIFF" ]; then
+            echo "No changes detected in this commit."
+            PR_DIFF="None"
+          fi
+
+          # Save the diff to an environment variable for later use
           echo "PR_DIFF<<EOF" >> $GITHUB_ENV
           echo "$PR_DIFF" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+
+      # Step 4: Display the PR diff (for debugging purposes)
+      - name: Display PR diff
+        run: |
+          echo "PR_DIFF is:"
+          echo "$PR_DIFF"
+
+      # Step 5: Based on PR_DIFF, run the impacted tests (you can customize this part)
+      - name: Run impacted tests
+        run: |
+          if [[ "$PR_DIFF" != "None" ]]; then
+            echo "Running impacted tests based on the following diff:"
+            echo "$PR_DIFF"
+            # Run your impacted tests, for example, using Cypress
+            # npx cypress run --spec 'cypress/integration/login.cy.js'
+          else
+            echo "No impacted tests to run."
+          fi
+
+
+
 
       - name: Run impact analysis
         id: run_analysis
