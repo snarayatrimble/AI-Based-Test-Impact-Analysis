@@ -1,49 +1,40 @@
-name: PR Impact Analysis
+name: Impacted Tests
 
 on:
   push:
     branches:
-      - test  # This should trigger on push to the 'test' branch or any other branch you're using
+      - test      # or any feature branch
   pull_request:
     branches:
       - main
 
 jobs:
-  test-impact:
+  impact-analysis:
     runs-on: ubuntu-latest
     steps:
-      # Checkout the code from the PR branch
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0   # full history needed for diff
 
-      # Fetch all history and origin/main branch
-      - name: Fetch the full history and origin/main
-        run: |
-          git fetch --unshallow  # Ensure full history is available (in case of shallow clone)
-          git fetch origin main  # Explicitly fetch the 'main' branch from the remote
+      - name: Fetch origin/main
+        run: git fetch origin main
 
-      # Get the diff for PR or commit
-      - name: Get diff for PR or commit
+      - name: Get PR diff
         id: get_diff
         run: |
-          # If it's a pull request, get the diff between the PR and main
-          if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-            PR_DIFF=$(git diff origin/main...HEAD)  # Compare the PR branch to the remote main branch
-          else
-            # If it's just a push to a feature branch (e.g., 'test'), compare 'test' to 'main'
-            PR_DIFF=$(git diff origin/main...HEAD)  # Compare the test branch with origin/main
-          fi
-
-          # If no changes are found (e.g., first commit), set PR_DIFF to "None"
+          PR_DIFF=$(git diff origin/main...HEAD)
           if [ -z "$PR_DIFF" ]; then
-            echo "No changes detected in this commit."
             PR_DIFF="None"
           fi
-
-          # Save the PR_DIFF to the environment variables for later use in the workflow
           echo "PR_DIFF<<EOF" >> $GITHUB_ENV
           echo "$PR_DIFF" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+
+      - name: Display diff
+        run: |
+          echo "Modified files and changes:"
+          echo "$PR_DIFF"
 
       # Add additional steps for running the impacted tests based on PR_DIFF
 
