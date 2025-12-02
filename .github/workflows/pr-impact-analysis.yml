@@ -56,11 +56,11 @@ jobs:
           if [[ "$PR_DIFF" == *"src/login.js"* ]]; then
             echo "Running login tests..."
             # Run the Cypress tests impacted by the login.js file
-          npx cypress run --spec cypress/integration/login.cy.js  # Correct glob pattern
+          npx cypress run --spec cypress/e2e/integration/login.cy.js  # Correct glob pattern
           fi
 
           if [[ "$PR_DIFF" == *"src/navbar.js"* ]]; then
             echo "Running navbar tests..."
             # Run impacted tests for navbar
-            npx cypress run --spec 'cypress/integration/navbar.cy.js'
+            npx cypress run --spec 'cypress/e2e/integration/navbar.cy.js'
           fi
