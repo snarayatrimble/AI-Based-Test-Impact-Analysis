@@ -26,7 +26,7 @@ function authenticateUser(username, password) {
   // Update user information
   function updateUserInformation(userId, newInfo) {
     // Simulate updating user information (e.g., name, email)
-    console.log(`Updating user ${userId}'s info to:`, newInfo);
+    console.log(`Updating users ${userId}'s info to:`, newInfo);
     return true;
   }
   
