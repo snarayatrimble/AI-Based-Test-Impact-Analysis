@@ -41,8 +41,3 @@ jobs:
           npx cypress run --reporter mochawesome --reporter-options reportDir=cypress/reports,overwrite=true,html=false,json=true
 
       # Step 6: Upload Mochawesome Report as an Artifact (Optional)
-      - name: Upload Test Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: mochawesome-report
-          path: cypress/reports/*.json
