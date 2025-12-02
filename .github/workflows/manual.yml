@@ -1,0 +1,49 @@
+# .github/workflows/pr-impact-analysis.yml
+
+name: Impact Analysis on PR
+
+on:
+  pull_request:
+    branches:
+      - master  # or the default branch of your repos
+
+jobs:
+  impact-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the PR code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Adjust Node.js version as needed
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          npm install
+
+      # Step 4: Get the diff of the PR
+      - name: Get PR diff
+        id: get_diff
+        run: |
+          PR_DIFF=$(git diff origin/main...HEAD)
+          echo "PR_DIFF<<EOF" >> $GITHUB_ENV
+          echo "$PR_DIFF" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      # Step 5: Run TensorFlow.js model for test impact analysis
+      - name: Run impact analysis
+        id: run_analysis
+        run: |
+          node loadAndPredict.js "$PR_DIFF"  # Pass the diff content to the model
+
+      # Step 6: Run impacted tests with Cypress
+      - name: Run impacted tests with Cypress
+        run: |
+          impactedTest="${{ steps.run_analysis.outputs.impactedTest }}"  # Use the predicted impacted test from the analysis
+          npx cypress run --spec "cypress/integration/$impactedTest"
