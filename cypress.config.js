@@ -8,7 +8,7 @@ module.exports = {
   "screenshotOnRunFailure":true,
   "pageLoadTimeout":60000,
   "env": {
-    "applicationurl":"https://fleetcockpitplus.stg.trimbletl.com/",
+    "landingpageurl":"https://fleetcockpitplus.stg.trimbletl.com/",
     "Device": "pc-testvehicle03",
     "Customer":"Autotest04",
     "CustomerDevice":"Test Unit",
