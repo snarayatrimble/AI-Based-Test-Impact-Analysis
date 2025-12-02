@@ -7,7 +7,7 @@ on:
     branches:
       - main        # This will trigger on commit to the main branch
       - develop
-  pull_request:
+pull_request:
     branches: 
       - master  # or the default branch of your repos
 
