@@ -3,9 +3,7 @@ name: Impact Analysis and Cypress Tests
 on:
   push:
     branches:
-      - main        # This will trigger on commits to the main branch
-      - develop     # You can also trigger on commits to other branches
-
+      - master        # This will trigger on commits to the main branch
 jobs:
   impact-analysis:
     runs-on: ubuntu-latest
