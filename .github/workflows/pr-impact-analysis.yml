@@ -1,53 +1,46 @@
-# .github/workflows/pr-impact-analysis.yml
-
-name: Impact Analysis on PR
+name: Impact Analysis and Cypress Tests
 
 on:
- push:
+  push:
     branches:
-      - main        # This will trigger on commit to the main branch
-      - develop
-  pull_request:
-    branches: 
-      - master  # or the default branch of your repos
-
+      - master        # This will trigger on commits to the main branch
 jobs:
   impact-analysis:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the PR code
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Adjust Node.js version as needed
+          node-version: '16'
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           npm install
 
-      # Step 4: Get the diff of the PR
-      - name: Get PR diff
+      - name: Get commit diff (for push or PR)
         id: get_diff
         run: |
-          PR_DIFF=$(git diff origin/main...HEAD)
+          # Get diff for commits or PR
+          if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+            git fetch origin main
+            PR_DIFF=$(git diff origin/main...HEAD)
+          else
+            PR_DIFF=$(git diff HEAD~1)
+          fi
           echo "PR_DIFF<<EOF" >> $GITHUB_ENV
           echo "$PR_DIFF" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      # Step 5: Run TensorFlow.js model for test impact analysis
       - name: Run impact analysis
         id: run_analysis
         run: |
-          node loadAndPredict.js "$PR_DIFF"  # Pass the diff content to the model
+          node loadAndPredict.js "$PR_DIFF"
 
-      # Step 6: Run impacted tests with Cypress
       - name: Run impacted tests with Cypress
         run: |
-          impactedTest="${{ steps.run_analysis.outputs.impactedTest }}"  # Use the predicted impacted test from the analysis
+          impactedTest="${{ steps.run_analysis.outputs.impactedTest }}"
           npx cypress run --spec "cypress/integration/$impactedTest"
