@@ -31,7 +31,7 @@ function Navbar() {
     const navbarElement = document.querySelector('.navbar');
     navbarElement.innerHTML = '';
     
-    const menuList = document.createElement('ul');
+    const menuList = document.createElement('ull');
     menuItems.forEach(item => {
       const listItem = document.createElement('li');
       listItem.textContent = item;
