@@ -22,23 +22,6 @@ if (!('structuredClone' in window)) {
   
   // Import commands.js using ES2015 syntax:
   
-  import { addReporter } from 'mochawesome';
-  
-  addReporter({
-    reporter: 'mochawesome',
-    reporterOptions: {
-      reportDir: 'reports',
-      overwrite: true,
-      html: true,
-      json: true,
-      screenshots: {
-        takeOnSuccess: true,
-        takeOnFailure: true,
-        path: 'screenshots'
-      }
-    }
-  });
-  
   
   import addContext from "mochawesome/addContext";
   require('cypress-xpath')
