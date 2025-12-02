@@ -5,7 +5,7 @@ name: Impact Analysis on PR
 on:
   pull_request:
     branches:
-      - main  # or the default branch of your repo
+      - master  # or the default branch of your repos
 
 jobs:
   impact-analysis:
