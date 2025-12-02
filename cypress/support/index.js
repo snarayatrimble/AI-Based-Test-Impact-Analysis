@@ -39,10 +39,18 @@ if (!('structuredClone' in window)) {
     }
   });
   
-  
-  require('cypress-xpath');
-  const mochawesome = require('mochawesome/addContext');
+
   //import '@cypress/code-coverage/support'
+
+  // Import for cypress-xpath
+import 'cypress-xpath';
+
+// Import for mochawesome (if you're using it in your test reporting)
+import mochawesome from 'mochawesome/addContext';
+
+// Import for cypress-wait-until
+import 'cypress-wait-until';
+
   
    const path = require( 'path' ),
       logPath = process.env.LOG_DIR || path.join( __dirname, '..', 'log' );

@@ -1,6 +1,5 @@
 
 import landingpage from '../pageobjects/landingpage.js';
-import 'cypress-wait-until';
 
 describe('Verifying LandingPage Components', { testIsolation: false }, function () {
 
