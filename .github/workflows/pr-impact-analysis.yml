@@ -21,15 +21,6 @@ jobs:
         with:
           fetch-depth: 0  # Fetch full history for proper comparison
 
-      - name: Print working directory
-        run: |
-          echo "Current directory is: $(pwd)"
-
-      - name: List files in cypress/integration
-        run: |
-          echo "Files in cypress/integration:"
-          ls cypress/integration/        
-
       # Step 2: Fetch the default branch dynamically
       - name: Get default branch name
         id: get_default_branch
@@ -65,7 +56,7 @@ jobs:
           if [[ "$PR_DIFF" == *"src/login.js"* ]]; then
             echo "Running login tests..."
             # Run the Cypress tests impacted by the login.js file
-          npx cypress run --spec cypress/integration/login.cy.js"  # Correct glob pattern
+          npx cypress run --spec cypress/integration/login.cy.js  # Correct glob pattern
           fi
 
           if [[ "$PR_DIFF" == *"src/navbar.js"* ]]; then
